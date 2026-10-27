@@ -1,0 +1,30 @@
+class Solution:
+    def countIslands(self, grid: List[List[int]], k: int) -> int:
+        count = 0
+        directions = [(1,0) , (0,1) , (-1,0) ,(0,-1)]
+        n = len(grid)
+        m = len(grid[0])
+
+        def dfs(r,c):
+            if r < 0 or r >= n or c < 0 or c >= m:
+                return 0
+
+            if grid[r][c] == 0:
+                return 0
+
+            sum = grid[r][c]
+            grid[r][c] = 0
+            for dr, dc in directions:
+                nr , nc = r + dr , c + dc    
+                sum += dfs(nr,nc)
+
+            return sum
+
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] != 0:
+                    result = dfs(i,j)
+
+                    if result % k == 0:
+                        count +=1
+        return count
