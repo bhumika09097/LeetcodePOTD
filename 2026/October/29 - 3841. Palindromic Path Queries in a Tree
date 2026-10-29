@@ -1,0 +1,57 @@
+Brute Force Approch (gives TLE)
+class Solution:
+    def palindromePath(self, n: int, edges: list[list[int]], s: str, queries: list[str]) -> list[bool]:
+        adj = defaultdict(list)
+
+        for u, v in edges:
+            adj[u].append(v)
+            adj[v].append(u)
+
+        result = []
+        s = list(s)
+
+        def dfs(node, end, visited, path):
+            if node == end:
+                return path
+
+            visited[node] = True
+
+            for nei in adj[node]:
+                if not visited[nei]:
+                    ans = dfs(nei, end, visited, path + s[nei])
+                    if ans is not None:
+                        return ans
+
+            return None
+
+        for query in queries:
+            if query[0] == 'q':
+                # Assuming query format: query u v
+                parts = query.split()
+                start = int(parts[1])
+                end = int(parts[2])
+
+                path = dfs(start, end, [False] * n, s[start])
+
+                if path is None:
+                    result.append(False)
+                    continue
+
+                freq = Counter(path)
+                odd_count = 0
+
+                for count in freq.values():
+                    if count % 2 != 0:
+                        odd_count += 1
+
+                result.append(odd_count <= 1)
+
+            else:
+                # Assuming query format: update index character
+                parts = query.split()
+                idx = int(parts[1])
+                char = parts[2]
+
+                s[idx] = char
+
+        return result
