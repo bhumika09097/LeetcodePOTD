@@ -1,0 +1,41 @@
+class Solution:
+    def uniquePaths(self, grid: List[List[int]]) -> int:
+        MOD = 10**9 + 7
+        rows = len(grid)
+        cols = len(grid[0])
+
+        LEFT = 0
+        UP = 1
+
+        memo = [[[-1, -1] for _ in range(cols)] for _ in range(rows)]
+
+        def solve(r, c, direction):
+
+            if r >= rows or c >= cols:
+                return 0
+
+            if r == rows - 1 and c == cols - 1:
+                return 1
+
+            if memo[r][c][direction] != -1:
+                return memo[r][c][direction]
+
+            if grid[r][c] == 1:
+
+                if direction == LEFT:
+                    memo[r][c][direction] = solve(r + 1, c, UP)
+                else:
+                    memo[r][c][direction] = solve(r, c + 1, LEFT)
+
+                return memo[r][c][direction]
+
+            totalWays = 0
+
+            totalWays = (totalWays + solve(r, c + 1, LEFT)) % MOD
+            totalWays = (totalWays + solve(r + 1, c, UP)) % MOD
+
+            memo[r][c][direction] = totalWays
+
+            return memo[r][c][direction]
+
+        return solve(0, 0, LEFT)
