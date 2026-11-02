@@ -1,0 +1,35 @@
+#Brute Force 
+class Solution:
+    def minMoves2(self, nums: list[int]) -> int:
+        n = len(nums)
+
+        moves = float('inf')
+        for i in range(n):
+            op = 0
+            for j in range(n):
+                if nums[i] != nums[j]:
+                    op += abs(nums[i] - nums[j])
+
+            moves = min(moves , op)
+
+        return moves
+
+#Optimal 
+class Solution:
+    def minMoves2(self, nums: list[int]) -> int:
+        n = len(nums)
+        
+        nums.sort()
+
+        median = nums[n//2]
+
+        moves = 0
+        for i in range(n//2):
+            moves += abs(median - nums[i])
+            moves += abs(median - nums[n-i-1])
+
+        return moves
+
+        
+
+        
