@@ -1,0 +1,136 @@
+class Solution:
+    def minOperations(self, nums: List[int], x: int, k: int) -> int:
+        low = []
+        high = []
+
+        deleted = set()
+        side = {}
+
+        low_size = high_size = 0
+        low_sum = high_sum = 0
+
+        def clean(heap):
+            while heap and heap[0][1] in deleted:
+                val, idx = heapq.heappop(heap)
+                deleted.remove(idx)
+
+        def rebalance():
+            nonlocal low_size, high_size
+            nonlocal low_sum, high_sum
+
+            clean(low)
+            clean(high)
+
+            while low_size > high_size + 1:
+                clean(low)
+
+                val, idx = heapq.heappop(low)
+                val = -val
+
+                heapq.heappush(high, (val, idx))
+                side[idx] = "high"
+
+                low_size -= 1
+                high_size += 1
+
+                low_sum -= val
+                high_sum += val
+
+            while low_size < high_size:
+                clean(high)
+
+                val, idx = heapq.heappop(high)
+
+                heapq.heappush(low, (-val, idx))
+                side[idx] = "low"
+
+                high_size -= 1
+                low_size += 1
+
+                high_sum -= val
+                low_sum += val
+
+        def add(val, idx):
+            nonlocal low_size, high_size
+            nonlocal low_sum, high_sum
+
+            clean(low)
+
+            if not low or val <= -low[0][0]:
+                heapq.heappush(low, (-val, idx))
+                side[idx] = "low"
+
+                low_size += 1
+                low_sum += val
+            else:
+                heapq.heappush(high, (val, idx))
+                side[idx] = "high"
+
+                high_size += 1
+                high_sum += val
+
+            rebalance()
+
+        def remove(val, idx):
+            nonlocal low_size, high_size
+            nonlocal low_sum, high_sum
+
+            heap_name = side.pop(idx)
+            deleted.add(idx)
+
+            if heap_name == "low":
+                low_size -= 1
+                low_sum -= val
+            else:
+                high_size -= 1
+                high_sum -= val
+
+            clean(low)
+            clean(high)
+
+            rebalance()
+
+        costs = []
+
+        for i in range(len(nums)):
+            add(nums[i], i)
+
+            if i >= x:
+                remove(nums[i - x], i - x)
+
+            if i >= x - 1:
+                clean(low)
+
+                median = -low[0][0]
+
+                cost = (
+                    median * low_size - low_sum
+                    + high_sum - median * high_size
+                )
+
+                costs.append(cost)
+
+        # Dynamic Programming
+
+        n = len(nums)
+        INF = float('inf')
+
+        dp = [[INF] * (k + 1) for _ in range(n + 1)]
+
+        for i in range(n + 1):
+            dp[i][0] = 0
+
+        for i in range(1, n + 1):
+            for j in range(1, k + 1):
+
+                # Skip current element
+                dp[i][j] = dp[i - 1][j]
+
+                # Select a window of size x
+                if i >= x:
+                    dp[i][j] = min(
+                        dp[i][j],
+                        dp[i - x][j - 1] + costs[i - x]
+                    )
+
+        return dp[n][k]
