@@ -1,0 +1,25 @@
+Brute Force Approach 
+class Solution:
+    def countServers(self, n: int, logs: List[List[int]], x: int, queries: List[int]) -> List[int]:
+        times = defaultdict(list)
+
+        result = []
+        for ser_id, time in logs:
+            times[ser_id].append(time)
+
+        for q in queries:
+            start = q - x
+            end = q
+            count = 0
+            for ser_id in times:
+                found = False
+                for t in times[ser_id]:
+                    if start <= t <= end:
+                        found = True
+                        break
+
+                if found:
+                    count += 1
+            result.append(n - count)
+
+        return result
