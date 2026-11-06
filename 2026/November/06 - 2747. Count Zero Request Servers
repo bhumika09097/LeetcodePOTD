@@ -23,3 +23,48 @@ class Solution:
             result.append(n - count)
 
         return result
+Optimal Aprroach
+class Solution:
+    def countServers(self, n: int, logs: List[List[int]], x: int, queries: List[int]) -> List[int]:
+        logs.sort(key=lambda a: a[1])
+
+        sorted_queries = []
+
+        for i in range(len(queries)):
+            sorted_queries.append([queries[i], i])
+
+        sorted_queries.sort()
+
+        freq = defaultdict(int)
+        result = [0] * len(queries)
+
+        left = 0
+        right = 0
+        active = 0
+
+        for q, idx in sorted_queries:
+            start = q - x
+            end = q
+
+            while right < len(logs) and logs[right][1] <= end:
+                ser_id = logs[right][0]
+
+                if freq[ser_id] == 0:
+                    active += 1
+
+                freq[ser_id] += 1
+                right += 1
+
+            while left < right and logs[left][1] < start:
+                ser_id = logs[left][0]
+
+                freq[ser_id] -= 1
+
+                if freq[ser_id] == 0:
+                    active -= 1
+
+                left += 1
+
+            result[idx] = n - active
+
+        return result
