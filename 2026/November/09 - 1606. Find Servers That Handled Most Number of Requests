@@ -1,0 +1,47 @@
+class Solution:
+    def busiestServers(self, k: int, arrival: list[int], load: list[int]) -> list[int]:
+        free = SortedList()
+
+        for i in range(k):
+            free.add(i)
+
+        busy = []
+        count = [0] * k
+
+        for i in range(len(arrival)):
+
+            # Release servers whose requests are completed
+            while busy and busy[0][0] <= arrival[i]:
+                end, server = heapq.heappop(busy)
+                free.add(server)
+
+            # Find the next available server
+            start = i % k
+
+            idx = free.bisect_left(start)
+
+            if idx == len(free):
+                idx = 0
+
+            if len(free) == 0:
+                continue
+
+            server = free.pop(idx)
+
+            # Count the request
+            count[server] += 1
+
+            # Add server to busy heap
+            end_time = arrival[i] + load[i]
+            heapq.heappush(busy, (end_time, server))
+
+        maximum = max(count)
+
+        ans = []
+
+        for i in range(k):
+            if count[i] == maximum:
+                ans.append(i)
+
+
+        return ans
