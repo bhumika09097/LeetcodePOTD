@@ -1,0 +1,14 @@
+class Solution:
+    def minimumCost(self, cost1: int, cost2: int, costBoth: int, need1: int, need2: int) -> int:
+        seperateCost = (need1 * cost1) + (need2 * cost2)
+
+        combineCost = costBoth * max(need1, need2)
+
+        if max(need1, need2) == need1 :
+            halfCost = cost1 * abs(need1 - need2)
+        else :
+            halfCost = cost2 * abs(need1 - need2)
+
+        thirdCost = costBoth * min(need1, need2) + halfCost 
+
+        return min(seperateCost , combineCost, thirdCost)
