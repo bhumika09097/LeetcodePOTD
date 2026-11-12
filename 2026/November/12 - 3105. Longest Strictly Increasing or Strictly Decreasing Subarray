@@ -1,0 +1,27 @@
+# Brute Force Aprroach
+class Solution:
+    def longestMonotonicSubarray(self, nums: List[int]) -> int:
+        n = len(nums)
+        ans = 1
+        for i in range(n):
+            increasinglen = 1
+            decreasinglen = 1
+            j = i
+            k = j +1 
+            
+            while k < n and nums[j] < nums[k]:
+                j += 1
+                k += 1
+                increasinglen +=1
+            
+            j = i
+            k = j +1 
+
+            while k < n and nums[j] > nums[k] :
+                j += 1
+                k += 1
+                decreasinglen += 1
+
+            ans = max(ans, increasinglen, decreasinglen)
+
+        return ans
