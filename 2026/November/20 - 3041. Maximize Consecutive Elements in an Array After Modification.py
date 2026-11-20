@@ -51,4 +51,46 @@ class Solution:
 
         return result
 
+# Bottom Up Approach
 
+class Solution:
+    def maxSelectedElements(self, nums: List[int]) -> int:
+        nums.sort()
+        n = len(nums)
+        dp = [[-1] * 2 for _ in range(n)]
+        def findMethod(start,target):
+            l = start
+            r = len(nums)-1
+            ans = -1
+            while l <= r:
+                mid = (r+l) // 2
+
+                if nums[mid] == target:
+                    ans = mid
+                    r = mid - 1
+                elif nums[mid] < target:
+                    l = mid + 1
+                else:
+                    r = mid - 1
+
+            return ans
+
+        result = 1
+
+        for i in range(n-1,-1,-1):
+            for inc in range(2):
+                currval = nums[i] + inc
+                length = 1
+
+                j = findMethod(i+1,currval+1)
+                if j != -1:
+                    length = max(length, 1+dp[j][0])
+                
+                j = findMethod(i+1,currval)
+                if j != -1:
+                    length = max(length, 1+dp[j][1])
+
+                dp[i][inc] = length
+                result = max(result,length)
+
+        return result
